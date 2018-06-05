@@ -171,9 +171,3 @@
     marker-clip: false;
   }
 }
-
-#hydrants {
-  marker-file: url('symbols/spring.svg');
-  marker-placement: interior;
-  marker-clip: false;
-}

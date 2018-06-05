@@ -53,6 +53,7 @@ Stylesheet:
   - aerialways.mss
   - admin.mss
   - addressing.mss
+  - hydrants.mss
 Layer:
   - id: world
     geometry: polygon
@@ -2624,12 +2625,15 @@ Layer:
     properties:
       minzoom: 14
   - id: hydrants
-    class: hydrant
     geometry: point
     <<: *extents
     Datasource:
       <<: *osm2pgsql
       table: |-
-        (SELECT way, "fire_hydrant:type" FROM planet_osm_point p WHERE p.emergency = 'fire_hydrant') AS hydrant_point
+        (SELECT way, 
+                "fire_hydrant:type" AS type
+         FROM planet_osm_point p 
+         WHERE p.emergency = 'fire_hydrant'
+        ) AS hydrant_point
     properties:
       minzoom: 12
