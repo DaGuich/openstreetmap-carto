@@ -1,6 +1,6 @@
 # Installation
 
-This document describes how to manually configure your system for running openstreetmap-carto. If you prefer quick, platform independent setup for a development environment, without the need to install and configure tools by hand, follow a Docker installation guide in [DOCKER.md](https://github.com/gravitystorm/openstreetmap-carto/blob/master/DOCKER.md).
+This document describes how to manually configure your system for running OpenStreetMap Carto. If you prefer quick, platform independent setup for a development environment, without the need to install and configure tools by hand, follow a Docker installation guide in [DOCKER.md](https://github.com/gravitystorm/openstreetmap-carto/blob/master/DOCKER.md).
 
 ## OpenStreetMap data
 You need OpenStreetMap data loaded into a PostGIS database (see below for [dependencies](#dependencies)). These stylesheets expect a database generated with osm2pgsql using the pgsql backend (table names of `planet_osm_point`, etc), the default database name (`gis`), and the [lua transforms](https://github.com/openstreetmap/osm2pgsql/blob/master/docs/lua.md) documented in the instructions below.
@@ -36,28 +36,13 @@ psql -d gis -f indexes.sql
 ## Scripted download
 Some features are rendered using preprocessed shapefiles.
 
-To obtain them you can run the following script.
+To download them and import them into the database you can run the following script
 
 ```
-scripts/get-shapefiles.py
+scripts/get-external-data.py
 ```
 
 This script downloads necessary files, generates and populates the *data* directory with all needed shapefiles, including indexing them through *shapeindex*.
-
-## Manual download
-
-You can also download them manually at the following paths:
-
-* [`world_bnd_m.shp`, `places.shp`, `world_boundaries_m.shp`](https://planet.openstreetmap.org/historical-shapefiles/world_boundaries-spherical.tgz)
-* [`simplified_land_polygons.shp`](http://data.openstreetmapdata.com/simplified-land-polygons-complete-3857.zip) (updated daily)
-* [`ne_110m_admin_0_boundary_lines_land.shp`](http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_boundary_lines_land.zip)
-* [`land_polygons.shp`](http://data.openstreetmapdata.com/land-polygons-split-3857.zip) (updated daily)
-* [`icesheet_polygons.shp`](http://data.openstreetmapdata.com/antarctica-icesheet-polygons-3857.zip)
-* [`icesheet_outlines.shp`](http://data.openstreetmapdata.com/antarctica-icesheet-outlines-3857.zip)
-
-The repeated www.naturalearthdata.com in the Natural Earth shapefiles is correct.
-
-Put these shapefiles at `path/to/openstreetmap-carto/data`.
 
 ## Fonts
 The stylesheet uses Noto, an openly licensed font family from Google with support for multiple scripts. The stylesheet uses Noto's "Sans" style where available. If not available, this stylesheet uses another appropriate style of the Noto family. The "UI" version is used where available, with its vertical metrics which fit better with Latin text.
@@ -66,7 +51,11 @@ DejaVu Sans is used as an optional fallback font for systems without Noto Sans. 
 
 Hanazono is used a fallback for seldom used CJK characters that are not covered by Noto.
 
-Unifont is used as a last resort fallback, with it's excellent coverage, common presence on machines, and ugly look.
+Unifont is used as a last resort fallback, with it's excellent coverage, common presence on machines, and ugly look. For compatibility reasons, we support two Linux-distributions-specific versions of Unifont, therefor it's expected that you *always* get a warning about a missing Unifont version.
+
+If you do not install all the fonts, the rendering itself will not break, but missing glyphs will be ugly.
+
+For more details, see the documentation at [fonts.mss](style/fonts.mss).
 
 ### Installation on Ubuntu/Debian
 
@@ -76,13 +65,13 @@ On Ubuntu 16.04 or Debian Testing you can download and install most of the requi
 sudo apt-get install fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted fonts-hanazono ttf-unifont
 ```
 
-Noto Emoji Regular can be downloaded [from the Noto Emoji repository](https://github.com/googlei18n/noto-emoji).
+Noto Emoji Regular (*not* Noto Color Emoji) can be downloaded [from the Noto Emoji repository](https://github.com/googlei18n/noto-emoji).
 
 It might be useful to have a more recent version of the fonts for [rare non-latin scripts](#non-latin-scripts). The current upstream font release has also some more scripts and style variants than in the Ubuntu package. It can be installed [from source](https://github.com/googlei18n/noto-fonts/blob/master/FAQ.md#where-are-the-fonts).
 
 DejaVu is packaged as `fonts-dejavu-core`.
 
-### Installation on other operation systems
+### Installation on other operating systems
 
 The fonts can be downloaded here:
 
@@ -91,7 +80,7 @@ The fonts can be downloaded here:
 * [Hanazono homepage](http://fonts.jp/hanazono/)
 * [Unifont homepage](http://unifoundry.com/)
 
-After the download, you have to install the font files in the usual way of your operation system.
+After the download, you have to install the font files in the usual way of your operating system.
 
 ### Non-latin scripts
 
@@ -113,8 +102,8 @@ To display any map a database containing OpenStreetMap data and some utilities a
 * [PostgreSQL](https://www.postgresql.org/)
 * [PostGIS](https://postgis.net/)
 * [osm2pgsql](https://github.com/openstreetmap/osm2pgsql#installing) to [import your data](https://switch2osm.org/loading-osm-data/) into a PostGIS database
-* `curl` and `unzip` for downloading and decompressing files
-* shapeindex (a companion utility to Mapnik found in the `mapnik-utils` package) for indexing downloaded shapefiles
+* Python 3 with the psycopg2, yaml, and requests libraries (`python3-psycopg2` `python3-yaml` `python3-requests` packages on Debian-derived systems)
+* `ogr2ogr` for loading shapefiles into the database (`gdal-bin` on Debian-derived systems)
 
 ### Optional development dependencies
 
